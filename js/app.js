@@ -34,7 +34,7 @@ app.controller('HomeController', function($scope) {
 		map = new google.maps.Map(document.getElementById('map'), {
 			center: {lat: position.coords.latitude, lng: position.coords.longitude},
 			mapTypeId: 'satellite',
-			zoom: 18
+			zoom: 17
 		});
 	};
 
@@ -48,7 +48,7 @@ app.controller('HomeController', function($scope) {
 			fillOpacity: 0.15,
 			map: map,
 			center: coordinate,
-			radius: 75
+			radius: 200
 		});
 		trackCircles.push(cityCircle);
 		map.setCenter(coordinate);
