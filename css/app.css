@@ -1,3 +1,9 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .width-100 {
   width: 100%;
 }
@@ -31,6 +37,10 @@
 
 .track-map {
   height: 500px;
+}
+
+.track-map-v2 {
+  height: 100%;
 }
 
 .btn {
