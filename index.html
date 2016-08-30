@@ -1,0 +1,47 @@
+
+<!doctype html>
+<html lang="en" ng-app="trackamon">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Track-a-Mon</title>
+		
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+  		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+
+		<link rel="stylesheet" type="text/css" href="lib/bootstrap-material-design.min.css">
+  		<link rel="stylesheet" type="text/css" href="lib/ripples.min.css">
+  		<link rel="stylesheet" type="text/css" href="lib/ripples.min.css">		
+		<!-- Application specific CSS -->
+		<link rel="stylesheet" href="css/app.css">		
+	</head>
+	<body ng-controller="ParentController">	
+		<div class="container main">
+			<div ng-view></div>
+		</div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-route.min.js"></script>
+		
+		<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+		
+		<script src="lib/material.min.js"></script>
+		<script src="lib/ripples.min.js"></script>
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.5/moment-timezone-with-data.min.js"></script>
+		
+		<script src="js/app.js"></script>
+		<script src="js/router.js"></script>
+
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqB4roNP8XH69zQn4zMFi0ampyvt0GzA0&callback=initMap"></script>
+	</body>
+</html>
+

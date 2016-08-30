@@ -1,0 +1,34 @@
+.width-100 {
+  width: 100%;
+}
+
+.margin-0 {
+  margin: 0px;
+}
+
+.page-title {
+  font-size: 4em;
+}
+
+.square {
+  border-width: thin;
+  border-style: solid;
+}
+
+.alert-plain {
+  background-color: #F9F9F9;
+  border-color: #444444;
+  color: #464646;
+}
+
+.sorting, .sorting_asc, .sorting_desc, .clickable-square:hover {
+  cursor: pointer;
+}
+
+.no-padding {
+  padding: 0px;
+}
+
+.track-map {
+  height: 500px;
+}

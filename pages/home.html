@@ -1,0 +1,19 @@
+<div ng-init="init()">
+	<h2>Track-a-mon</h2>
+	<div ng-show="message" class="alert alert-danger">
+		{{message}}
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div id="map" class="track-map"></div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-6">
+			<button class="btn btn-success" ng-click="addTrackingPoint()">Mon in Sightings</button>
+		</div>
+		<div class="col-xs-6">
+			<button class="btn btn-warning" ng-click="clearTracking()">Clear</button>
+		</div>
+	</div>
+</div>
