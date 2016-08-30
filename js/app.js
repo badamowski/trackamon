@@ -7,7 +7,7 @@ app.controller('ParentController', function($scope) {
 app.controller('HomeController', function($scope) {
 	var trackCircles = [],
 		disappearedCircles = [],
-		map;
+		currentLocationMarker, map;
 
 	$scope.init = function(){
 		if (navigator.geolocation) {
@@ -50,8 +50,10 @@ app.controller('HomeController', function($scope) {
 	};
 
 	loadInitialMap = function(position){
+		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude};
+
 		map = new google.maps.Map(document.getElementById('map'), {
-			center: {lat: position.coords.latitude, lng: position.coords.longitude},
+			center: coordinate,
 			mapTypeId: 'satellite',
 			zoom: 17,
 			streetViewControl: false,
@@ -59,6 +61,20 @@ app.controller('HomeController', function($scope) {
 				style: google.maps.ZoomControlStyle.SMALL,
 				position: google.maps.ControlPosition.LEFT_BOTTOM
 			}
+		});
+
+		currentLocationMarker = new google.maps.Marker({
+			position: coordinate,
+			icon: {
+				path: google.maps.SymbolPath.CIRCLE,
+				scale: 5,
+				fillColor: "#00BFFF",
+				fillOpacity: 1.0,
+				strokeColor: "#00BFFF",
+				strokeOpacity: 1.0
+			},
+			draggable: false,
+			map: map
 		});
 
 		var clearButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
@@ -91,6 +107,7 @@ app.controller('HomeController', function($scope) {
 		});
 		trackCircles.push(cityCircle);
 		map.setCenter(coordinate);
+		currentLocationMarker.setPosition(coordinate);
 	};
 
 	addDisappearedPointAtPosition = function(position) {
@@ -106,6 +123,7 @@ app.controller('HomeController', function($scope) {
 			radius: 200
 		});
 		disappearedCircles.push(cityCircle);
+		currentLocationMarker.setPosition(coordinate);
 	};
 });
 
