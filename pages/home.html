@@ -1,18 +1,14 @@
-<div class="container main" ng-init="init()">
-	<div ng-show="message" class="alert alert-danger">
-		{{message}}
-	</div>
-	<div class="row">
-		<div class="col-xs-12">
-			<div id="map" class="track-map"></div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-xs-6">
-			<button class="btn btn-raised btn-success width-100" ng-click="addTrackingPoint()"><i class="fa fa-map-marker" aria-hidden="true"></i> Mon Sighting</button>
-		</div>
-		<div class="col-xs-6">
-			<button class="btn btn-raised btn-danger width-100" ng-click="clearTracking()"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>
-		</div>
-	</div>
+<div id="map" class="track-map" ng-init="init()"></div>
+<div class="modal fade" id="help-modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Track-a-Mon!</h4>
+				</div>
+			<div class="modal-body">
+				Track your mons bro!
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
 </div>
