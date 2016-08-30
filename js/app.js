@@ -37,6 +37,12 @@ app.controller('HomeController', function($scope) {
 		_.each(trackCircles, function(trackCircle){
 			trackCircle.setMap(null);
 		});
+		_.each(disappearedCircles, function(disappearedCircle){
+			disappearedCircle.setMap(null);
+		});
+
+		trackCircles = [];
+		disappearedCircles = [];
 	};
 
 	$scope.openHelp = function(){
@@ -78,7 +84,7 @@ app.controller('HomeController', function($scope) {
 			strokeOpacity: 0.5,
 			strokeWeight: 1,
 			fillColor: '#008000',
-			fillOpacity: 0.15,
+			fillOpacity: 0.2,
 			map: map,
 			center: coordinate,
 			radius: 200
@@ -94,13 +100,12 @@ app.controller('HomeController', function($scope) {
 			strokeOpacity: 0.5,
 			strokeWeight: 1,
 			fillColor: '#FF0000',
-			fillOpacity: 0.15,
+			fillOpacity: 0.5,
 			map: map,
 			center: coordinate,
 			radius: 200
 		});
-		trackCircles.push(cityCircle);
-		map.setCenter(coordinate);
+		disappearedCircles.push(cityCircle);
 	};
 });
 
