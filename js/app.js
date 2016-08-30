@@ -48,7 +48,7 @@ app.controller('HomeController', function($scope) {
 			fillOpacity: 0.15,
 			map: map,
 			center: coordinate,
-			radius: 70
+			radius: 75
 		});
 		trackCircles.push(cityCircle);
 		map.setCenter(coordinate);
