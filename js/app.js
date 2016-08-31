@@ -115,8 +115,8 @@ app.controller('HomeController', function($scope) {
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
-		map.controls[google.maps.ControlPosition.RIGHT_TOP].push(clearButton[0]);
-		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(helpButton[0]);
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
+		map.controls[google.maps.ControlPosition.TOP_CENTER].push(helpButton[0]);
 	};
 
 	addTrackingPointAtPosition = function(position){
