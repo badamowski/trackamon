@@ -5,48 +5,68 @@ app.controller('ParentController', function($scope) {
 });
 
 app.controller('HomeController', function($scope) {
-	var trackCircles = [],
-		disappearedCircles = [],
+	var circles = [],
 		currentLocationMarker, map;
 
 	$scope.init = function(){
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(loadInitialMap);
-		} else {
-			$scope.message = "Geolocation is not supported by this browser.";
-		}
+		findCurrentLocation(loadInitialMap);
+
+		$( window ).on( "orientationchange", function( event ) {
+			$scope.refresh();
+		});
 	};
 
 	$scope.addTrackingPoint = function(){
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(addTrackingPointAtPosition);
-		} else {
-			$scope.message = "Geolocation is not supported by this browser.";
-		}
+		findCurrentLocation(addTrackingPointAtPosition);
 	};
 
 	$scope.addDisappearedPoint = function(){
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(addDisappearedPointAtPosition);
-		} else {
-			$scope.message = "Geolocation is not supported by this browser.";
-		}
+		findCurrentLocation(addDisappearedPointAtPosition);
 	};
 
 	$scope.clearTracking = function(){
-		_.each(trackCircles, function(trackCircle){
-			trackCircle.setMap(null);
-		});
-		_.each(disappearedCircles, function(disappearedCircle){
-			disappearedCircle.setMap(null);
+		_.each(circles, function(circle){
+			circle.setMap(null);
 		});
 
-		trackCircles = [];
-		disappearedCircles = [];
+		circles = [];
 	};
 
 	$scope.openHelp = function(){
 		$("#help-modal").modal();
+	};
+
+	$scope.refresh = function(){
+		_.each(circles, function(circle){
+			circle.setMap(null);
+		});
+
+		_.each(circles, function(circle){
+			circle.setMap(map);
+		});
+
+		findCurrentLocation(centerOnCurrentLocation);
+	};
+
+	$scope.undo = function(){
+		if(circles.length > 0){
+			var circle = circles.pop();
+			circle.setMap(null);
+		}
+	};
+
+	findCurrentLocation = function(callback){
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(callback);
+		} else {
+			$scope.message = "Geolocation is not supported by this browser.";
+		}
+	};
+
+	centerOnCurrentLocation = function(position){
+		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude};
+		currentLocationMarker.setPosition(coordinate);		
+		map.setCenter(coordinate);
 	};
 
 	loadInitialMap = function(position){
@@ -80,15 +100,21 @@ app.controller('HomeController', function($scope) {
 		var clearButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
 			sightingButton = $('<button class="btn btn-raised btn-success btn-lg"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
 			disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
-			helpButton = $('<button class="btn btn-raised btn-lg"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>');
+			helpButton = $('<button class="btn btn-raised btn-lg"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>'),
+			refreshButton = $('<button class="btn btn-raised btn-info btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</button>'),
+			undoButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>');
 
 		sightingButton.bind('click', $scope.addTrackingPoint);
 		disappearedButton.bind('click', $scope.addDisappearedPoint);
 		clearButton.bind('click', $scope.clearTracking);
 		helpButton.bind('click', $scope.openHelp);
+		refreshButton.bind('click', $scope.refresh);
+		undoButton.bind('click', $scope.undo);
 
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(sightingButton[0]);
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
 		map.controls[google.maps.ControlPosition.RIGHT_TOP].push(clearButton[0]);
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(helpButton[0]);
 	};
@@ -96,16 +122,16 @@ app.controller('HomeController', function($scope) {
 	addTrackingPointAtPosition = function(position){
 		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude},
 			cityCircle = new google.maps.Circle({
-			strokeColor: '#008000',
+			strokeColor: '#00FF00',
 			strokeOpacity: 0.5,
 			strokeWeight: 1,
-			fillColor: '#008000',
-			fillOpacity: 0.2,
+			fillColor: '#00FF00',
+			fillOpacity: 0.3,
 			map: map,
 			center: coordinate,
 			radius: 200
 		});
-		trackCircles.push(cityCircle);
+		circles.push(cityCircle);
 		map.setCenter(coordinate);
 		currentLocationMarker.setPosition(coordinate);
 	};
@@ -122,7 +148,7 @@ app.controller('HomeController', function($scope) {
 			center: coordinate,
 			radius: 200
 		});
-		disappearedCircles.push(cityCircle);
+		circles.push(cityCircle);
 		currentLocationMarker.setPosition(coordinate);
 	};
 });
