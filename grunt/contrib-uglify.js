@@ -11,6 +11,9 @@ module.exports = function(grunt) {
 			}
 		},
 		prod: {
+			options: {
+				mangle: false
+			},
 			files: {
 				'dist/js/app.js': ['src/js/app.js', 'src/js/router.js']
 			}
