@@ -6,6 +6,13 @@ app.controller('ParentController', function($scope) {
 
 app.controller('HomeController', function($scope) {
 	var circles = [],
+		tracking = false,
+		clearButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
+		sightingButton = $('<button class="btn btn-raised btn-success btn-lg"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
+		disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
+		helpButton = $('<button class="btn btn-raised btn-lg"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>'),
+		refreshButton = $('<button class="btn btn-raised btn-info btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</button>'),
+		undoButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>'),
 		currentLocationMarker, map;
 
 	$scope.init = function(){
@@ -30,6 +37,12 @@ app.controller('HomeController', function($scope) {
 		});
 
 		circles = [];
+		tracking = false;
+
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].pop();
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
 	};
 
 	$scope.openHelp = function(){
@@ -98,13 +111,6 @@ app.controller('HomeController', function($scope) {
 			map: map
 		});
 
-		var clearButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
-			sightingButton = $('<button class="btn btn-raised btn-success btn-lg"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
-			disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
-			helpButton = $('<button class="btn btn-raised btn-lg"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>'),
-			refreshButton = $('<button class="btn btn-raised btn-info btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</button>'),
-			undoButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>');
-
 		sightingButton.bind('click', $scope.addTrackingPoint);
 		disappearedButton.bind('click', $scope.addDisappearedPoint);
 		clearButton.bind('click', $scope.clearTracking);
@@ -113,10 +119,6 @@ app.controller('HomeController', function($scope) {
 		undoButton.bind('click', $scope.undo);
 
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(sightingButton[0]);
-		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
-		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
-		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
-		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
 		map.controls[google.maps.ControlPosition.TOP_CENTER].push(helpButton[0]);
 	};
 
@@ -136,6 +138,14 @@ app.controller('HomeController', function($scope) {
 		circles.push(cityCircle);
 		map.setCenter(coordinate);
 		currentLocationMarker.setPosition(coordinate);
+
+		if(!tracking){
+			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
+			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
+			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
+			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
+			tracking = true;
+		}
 	};
 
 	addDisappearedPointAtPosition = function(position) {
@@ -157,3 +167,14 @@ app.controller('HomeController', function($scope) {
 });
 
 initMap = function(){};
+
+app.config(function($routeProvider) {
+  $routeProvider
+
+  .when('/', {
+    templateUrl : 'pages/home.html',
+    controller  : 'HomeController'
+  })
+  
+  .otherwise({redirectTo: '/'});
+});
