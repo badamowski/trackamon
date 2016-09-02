@@ -91,7 +91,8 @@ app.controller('HomeController', function($scope) {
 				fillColor: "#00BFFF",
 				fillOpacity: 1.0,
 				strokeColor: "#00BFFF",
-				strokeOpacity: 1.0
+				strokeOpacity: 1.0,
+				zIndex: 20
 			},
 			draggable: false,
 			map: map
@@ -129,7 +130,8 @@ app.controller('HomeController', function($scope) {
 			fillOpacity: 0.3,
 			map: map,
 			center: coordinate,
-			radius: 200
+			radius: 200,
+			zIndex: 5
 		});
 		circles.push(cityCircle);
 		map.setCenter(coordinate);
@@ -146,7 +148,8 @@ app.controller('HomeController', function($scope) {
 			fillOpacity: 0.5,
 			map: map,
 			center: coordinate,
-			radius: 200
+			radius: 200,
+			zIndex: 10
 		});
 		circles.push(cityCircle);
 		currentLocationMarker.setPosition(coordinate);
