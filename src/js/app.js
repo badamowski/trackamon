@@ -58,7 +58,7 @@ app.controller('HomeController', function($scope) {
 		appearanceOrDisappearance = [];
 
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].pop();
-		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
+		//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
 	};
