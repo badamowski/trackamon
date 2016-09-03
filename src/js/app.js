@@ -9,16 +9,26 @@ app.controller('HomeController', function($scope) {
 		appearancePoints = [],
 		disappearancePoints = [],
 		appearanceOrDisappearance = [],
+		squares = [],
 		tracking = false,
-		accuracy = 5,
+		accuracy = 10,
 		range = 200,
+		distanceForAppearance = (range + accuracy)/accuracy,
+		distanceForDisappearance = (range - accuracy)/accuracy,
 		clearButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
 		sightingButton = $('<button class="btn btn-raised btn-success btn-lg"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
 		disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
 		helpButton = $('<button class="btn btn-raised btn-lg"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>'),
 		refreshButton = $('<button class="btn btn-raised btn-info btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</button>'),
 		undoButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>'),
-		currentLocationMarker, map;
+		currentLocationMarker, 
+		map, 
+		latitudeDifference,	
+		longitudeDifference, 
+		maxLatitudeNorth, 
+		maxLatitudeSouth, 
+		maxLongitudeEast,
+		maxLongitudeWest;
 
 	$scope.init = function(){
 		findCurrentLocation(loadInitialMap);
@@ -37,11 +47,11 @@ app.controller('HomeController', function($scope) {
 	};
 
 	$scope.clearTracking = function(){
-		_.each(circles, function(circle){
-			circle.setMap(null);
+		_.each(squares, function(square){
+			square.rectangle.setMap(null);
 		});
 
-		circles = [];
+		squares = [];
 		tracking = false;
 		appearancePoints = [];
 		disappearancePoints = [];
@@ -58,38 +68,53 @@ app.controller('HomeController', function($scope) {
 	};
 
 	$scope.refresh = function(){
-		_.each(circles, function(circle){
-			circle.setMap(null);
+		_.each(squares, function(square){
+			square.rectangle.setMap(null);
 		});
 
-		_.each(circles, function(circle){
-			circle.setMap(map);
+		_.each(squares, function(square){
+			if(square.active){
+				square.rectangle.setMap(map);
+			}
 		});
 
 		findCurrentLocation(centerOnCurrentLocation);
 	};
 
 	$scope.undo = function(){
-		var appearance = appearanceOrDisappearance.pop();
+		var appearance = appearanceOrDisappearance.pop(),
+			undoSquare;
 		if(appearance){
-			appearancePoints.pop();
+			undoSquare = appearancePoints.pop();
 		}else{
-			disappearancePoints.pop();
+			undoSquare = disappearancePoints.pop();
 		}
-		track();
+		console.log("TODO");
 	};
 
-	track = function(){
+	track = function(coordinate, isAppearance){
+		_.each(squares, function(square){
+			if(square.active){
+				var latitudeLength = (square.centerLatitude - coordinate.lat)/latitudeDifference,
+					longitudeLength = (square.centerLongitude - coordinate.lng)/longitudeDifference,
+					distanceToCenter = Math.sqrt((latitudeLength*latitudeLength) + (longitudeLength*longitudeLength));
 
+				if((isAppearance && distanceToCenter > distanceForAppearance)
+					|| (!isAppearance && distanceToCenter < distanceForDisappearance)){
+					square.rectangle.setMap(null);
+					square.active = false;
+				}
+			}
+		});
 	};
 
 	buildStartingSquares = function(coordinate){
-		var latitudeDifference = coordinate.lat - geolib.computeDestinationPoint(coordinate, accuracy, 0).latitude,
-			longitudeDifference = coordinate.lng - geolib.computeDestinationPoint(coordinate, accuracy, 90).longitude,
-			maxLatitudeNorth = geolib.computeDestinationPoint(coordinate, range, 0).latitude,
-			maxLatitudeSouth = geolib.computeDestinationPoint(coordinate, range, 180).latitude,
-			maxLongitudeEast = geolib.computeDestinationPoint(coordinate, range, 90).longitude,
-			maxLongitudeWest = geolib.computeDestinationPoint(coordinate, range, 270).longitude;
+		latitudeDifference = coordinate.lat - geolib.computeDestinationPoint(coordinate, accuracy, 0).latitude;
+		longitudeDifference = coordinate.lng - geolib.computeDestinationPoint(coordinate, accuracy, 90).longitude;
+		maxLatitudeNorth = geolib.computeDestinationPoint(coordinate, range, 0).latitude;
+		maxLatitudeSouth = geolib.computeDestinationPoint(coordinate, range, 180).latitude;
+		maxLongitudeEast = geolib.computeDestinationPoint(coordinate, range, 90).longitude;
+		maxLongitudeWest = geolib.computeDestinationPoint(coordinate, range, 270).longitude;
 
 		if(latitudeDifference < 0){
 			latitudeDifference *= -1;
@@ -98,12 +123,6 @@ app.controller('HomeController', function($scope) {
 		if(longitudeDifference < 0){
 			longitudeDifference *= -1;
 		}
-
-		console.log(coordinate);
-		console.log(maxLatitudeNorth);
-		console.log(maxLatitudeSouth);
-		console.log(maxLongitudeEast);
-		console.log(maxLongitudeWest);
 
 		drawSquaresHorizontal(maxLongitudeWest, maxLongitudeEast, longitudeDifference, maxLatitudeSouth, maxLatitudeNorth, latitudeDifference);
 	};
@@ -130,6 +149,7 @@ app.controller('HomeController', function($scope) {
 	};
 
 	drawSquare = function(north, south, east, west){
+
 		var rectangle = new google.maps.Rectangle({
 			strokeWeight: 0,
 			fillColor: '#00FF00',
@@ -142,6 +162,17 @@ app.controller('HomeController', function($scope) {
 				west: west
 			}
 		});
+
+		squares.push({
+			active: true,
+			north: north,
+			south: south,
+			east: east,
+			west: west,
+			centerLatitude: (north+south)/2,
+			centerLongitude: (east+west)/2,
+			rectangle: rectangle
+		});	
 	};
 
 	findCurrentLocation = function(callback){
@@ -211,14 +242,17 @@ app.controller('HomeController', function($scope) {
 		}
 
 		appearancePoints.push(coordinate);
-		track();
+		appearanceOrDisappearance.push(true);
+		track(coordinate, true);
 		map.setCenter(coordinate);
 		currentLocationMarker.setPosition(coordinate);
 	};
 
 	addDisappearedPointAtPosition = function(position) {
+		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude};
 		disappearancePoints.push(coordinate);
-		track();
+		appearanceOrDisappearance.push(false);
+		track(coordinate, false);
 		currentLocationMarker.setPosition(coordinate);
 	};
 });
