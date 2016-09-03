@@ -19,7 +19,7 @@ app.controller('HomeController', function($scope) {
 		sightingButton = $('<button class="btn btn-raised btn-success btn-lg"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
 		disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
 		helpButton = $('<button class="btn btn-raised btn-lg"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>'),
-		refreshButton = $('<button class="btn btn-raised btn-info btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</button>'),
+		refreshButton = $('<button class="btn btn-raised btn-info btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i> Re-Draw</button>'),
 		undoButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>'),
 		currentLocationMarker, 
 		map, 
@@ -262,7 +262,7 @@ app.controller('HomeController', function($scope) {
 			buildStartingSquares(coordinate);
 			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
 			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
-			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
+			//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
 			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
 			tracking = true;
 		}
