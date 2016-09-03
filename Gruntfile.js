@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 	grunt.loadTasks("grunt");
 
 	// actual tasks
-	grunt.registerTask("dev", ["clean", "copy:dist", "copy:lib", "uglify:dev", "run:nodedev"]);
+	grunt.registerTask("dev", ["run:nodedev"]);
 	grunt.registerTask("prod", ["clean", "copy:dist", "copy:lib", "uglify:prod", "copy:public"]);
 
 };

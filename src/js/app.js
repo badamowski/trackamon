@@ -6,7 +6,29 @@ app.controller('ParentController', function($scope) {
 
 app.controller('HomeController', function($scope) {
 	var circles = [],
-		currentLocationMarker, map;
+		appearancePoints = [],
+		disappearancePoints = [],
+		appearanceOrDisappearance = [],
+		squares = [],
+		tracking = false,
+		accuracy = 10,
+		range = 200,
+		distanceForAppearance = (range + accuracy)/accuracy,
+		distanceForDisappearance = (range - accuracy)/accuracy,
+		clearButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
+		sightingButton = $('<button class="btn btn-raised btn-success btn-lg"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
+		disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
+		helpButton = $('<button class="btn btn-raised btn-lg"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>'),
+		refreshButton = $('<button class="btn btn-raised btn-info btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i> Re-Draw</button>'),
+		undoButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>'),
+		currentLocationMarker, 
+		map, 
+		latitudeDifference,	
+		longitudeDifference, 
+		maxLatitudeNorth, 
+		maxLatitudeSouth, 
+		maxLongitudeEast,
+		maxLongitudeWest;
 
 	$scope.init = function(){
 		findCurrentLocation(loadInitialMap);
@@ -25,11 +47,20 @@ app.controller('HomeController', function($scope) {
 	};
 
 	$scope.clearTracking = function(){
-		_.each(circles, function(circle){
-			circle.setMap(null);
+		_.each(squares, function(square){
+			square.rectangle.setMap(null);
 		});
 
-		circles = [];
+		squares = [];
+		tracking = false;
+		appearancePoints = [];
+		disappearancePoints = [];
+		appearanceOrDisappearance = [];
+
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].pop();
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
 	};
 
 	$scope.openHelp = function(){
@@ -37,22 +68,138 @@ app.controller('HomeController', function($scope) {
 	};
 
 	$scope.refresh = function(){
-		_.each(circles, function(circle){
-			circle.setMap(null);
+		_.each(squares, function(square){
+			square.rectangle.setMap(null);
 		});
 
-		_.each(circles, function(circle){
-			circle.setMap(map);
+		_.each(squares, function(square){
+			if(square.active){
+				square.rectangle.setMap(map);
+			}
 		});
 
 		findCurrentLocation(centerOnCurrentLocation);
 	};
 
 	$scope.undo = function(){
-		if(circles.length > 0){
-			var circle = circles.pop();
-			circle.setMap(null);
+		var appearance = appearanceOrDisappearance.pop(),
+			undoSquare;
+		if(appearance){
+			undoSquare = appearancePoints.pop();
+		}else{
+			undoSquare = disappearancePoints.pop();
 		}
+		console.log("TODO");
+	};
+
+	track = function(coordinate, isAppearance){
+		var maxLat = coordinate.lat, 
+			maxLng = coordinate.lng, 
+			minLat = coordinate.lat,
+			minLng = coordinate.lng;
+
+		_.each(squares, function(square){
+			if(square.active){
+				var latitudeLength = (square.centerLatitude - coordinate.lat)/latitudeDifference,
+					longitudeLength = (square.centerLongitude - coordinate.lng)/longitudeDifference,
+					distanceToCenter = Math.sqrt((latitudeLength*latitudeLength) + (longitudeLength*longitudeLength));
+
+				if((isAppearance && distanceToCenter > distanceForAppearance)
+					|| (!isAppearance && distanceToCenter < distanceForDisappearance)){
+					square.rectangle.setMap(null);
+					square.active = false;
+				} else {
+					if(square.north > maxLat){
+						maxLat = square.north;
+					}
+
+					if(square.south < minLat){
+						minLat = square.south;
+					}
+
+					if(square.east > maxLng){
+						maxLng = square.east;
+					}
+
+					if(square.west < minLng){
+						minLng = square.west;
+					}
+				}
+			}
+		});
+
+		var bounds = new google.maps.LatLngBounds(
+			new google.maps.LatLng(minLat, minLng), 
+			new google.maps.LatLng(maxLat, maxLng));
+
+		map.fitBounds(bounds);
+	};
+
+	buildStartingSquares = function(coordinate){
+		latitudeDifference = coordinate.lat - geolib.computeDestinationPoint(coordinate, accuracy, 0).latitude;
+		longitudeDifference = coordinate.lng - geolib.computeDestinationPoint(coordinate, accuracy, 90).longitude;
+		maxLatitudeNorth = geolib.computeDestinationPoint(coordinate, range, 0).latitude;
+		maxLatitudeSouth = geolib.computeDestinationPoint(coordinate, range, 180).latitude;
+		maxLongitudeEast = geolib.computeDestinationPoint(coordinate, range, 90).longitude;
+		maxLongitudeWest = geolib.computeDestinationPoint(coordinate, range, 270).longitude;
+
+		if(latitudeDifference < 0){
+			latitudeDifference *= -1;
+		}
+
+		if(longitudeDifference < 0){
+			longitudeDifference *= -1;
+		}
+
+		drawSquaresHorizontal(maxLongitudeWest, maxLongitudeEast, longitudeDifference, maxLatitudeSouth, maxLatitudeNorth, latitudeDifference);
+	};
+
+	drawSquaresHorizontal = function(startinglongitude, endingLongitude, longitudeDifference, startingLatitude, maxLatitudeNorth, latitudeDifference){
+		var maxLatitude = startingLatitude + latitudeDifference
+
+		while(startinglongitude < endingLongitude){
+			var nextLongitude = startinglongitude + longitudeDifference;
+			drawSquare(maxLatitude, startingLatitude, nextLongitude, startinglongitude);
+			drawSquaresVertical(maxLatitude, maxLatitudeNorth, latitudeDifference, startinglongitude, longitudeDifference);
+			startinglongitude = nextLongitude;
+		}
+	};
+
+	drawSquaresVertical = function(startingLatitude, endingLatitude, latitudeDifference, startinglongitude, longitudeDifference){
+		var maxLongitude = startinglongitude + longitudeDifference
+
+		while(startingLatitude < endingLatitude){
+			var nextLatitude = startingLatitude + latitudeDifference;
+			drawSquare(nextLatitude, startingLatitude, maxLongitude, startinglongitude);
+			startingLatitude = nextLatitude;
+		}
+	};
+
+	drawSquare = function(north, south, east, west){
+
+		var rectangle = new google.maps.Rectangle({
+			strokeWeight: 0,
+			fillColor: '#00FF00',
+			fillOpacity: 0.35,
+			map: map,
+			bounds: {
+				north: north,
+				south: south,
+				east: east,
+				west: west
+			}
+		});
+
+		squares.push({
+			active: true,
+			north: north,
+			south: south,
+			east: east,
+			west: west,
+			centerLatitude: (north+south)/2,
+			centerLongitude: (east+west)/2,
+			rectangle: rectangle
+		});	
 	};
 
 	findCurrentLocation = function(callback){
@@ -66,7 +213,6 @@ app.controller('HomeController', function($scope) {
 	centerOnCurrentLocation = function(position){
 		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude};
 		currentLocationMarker.setPosition(coordinate);		
-		map.setCenter(coordinate);
 	};
 
 	loadInitialMap = function(position){
@@ -98,13 +244,6 @@ app.controller('HomeController', function($scope) {
 			map: map
 		});
 
-		var clearButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
-			sightingButton = $('<button class="btn btn-raised btn-success btn-lg"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
-			disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
-			helpButton = $('<button class="btn btn-raised btn-lg"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>'),
-			refreshButton = $('<button class="btn btn-raised btn-info btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</button>'),
-			undoButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>');
-
 		sightingButton.bind('click', $scope.addTrackingPoint);
 		disappearedButton.bind('click', $scope.addDisappearedPoint);
 		clearButton.bind('click', $scope.clearTracking);
@@ -113,47 +252,45 @@ app.controller('HomeController', function($scope) {
 		undoButton.bind('click', $scope.undo);
 
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(sightingButton[0]);
-		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
-		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
-		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
-		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
 		map.controls[google.maps.ControlPosition.TOP_CENTER].push(helpButton[0]);
 	};
 
 	addTrackingPointAtPosition = function(position){
-		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude},
-			cityCircle = new google.maps.Circle({
-			strokeColor: '#00FF00',
-			strokeOpacity: 0.5,
-			strokeWeight: 1,
-			fillColor: '#00FF00',
-			fillOpacity: 0.3,
-			map: map,
-			center: coordinate,
-			radius: 200,
-			zIndex: 5
-		});
-		circles.push(cityCircle);
-		map.setCenter(coordinate);
+		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude};
+
+		if(!tracking){
+			buildStartingSquares(coordinate);
+			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
+			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
+			//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
+			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
+			tracking = true;
+		}
+
+		appearancePoints.push(coordinate);
+		appearanceOrDisappearance.push(true);
+		track(coordinate, true);
 		currentLocationMarker.setPosition(coordinate);
 	};
 
 	addDisappearedPointAtPosition = function(position) {
-		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude},
-			cityCircle = new google.maps.Circle({
-			strokeColor: '#FF0000',
-			strokeOpacity: 0.5,
-			strokeWeight: 1,
-			fillColor: '#FF0000',
-			fillOpacity: 0.5,
-			map: map,
-			center: coordinate,
-			radius: 200,
-			zIndex: 10
-		});
-		circles.push(cityCircle);
+		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude};
+		disappearancePoints.push(coordinate);
+		appearanceOrDisappearance.push(false);
+		track(coordinate, false);
 		currentLocationMarker.setPosition(coordinate);
 	};
 });
 
 initMap = function(){};
+
+app.config(function($routeProvider) {
+  $routeProvider
+
+  .when('/', {
+    templateUrl : 'pages/home.html',
+    controller  : 'HomeController'
+  })
+  
+  .otherwise({redirectTo: '/'});
+});
