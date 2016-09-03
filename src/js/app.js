@@ -93,6 +93,11 @@ app.controller('HomeController', function($scope) {
 	};
 
 	track = function(coordinate, isAppearance){
+		var maxLat = coordinate.lat, 
+			maxLng = coordinate.lng, 
+			minLat = coordinate.lat,
+			minLng = coordinate.lng;
+
 		_.each(squares, function(square){
 			if(square.active){
 				var latitudeLength = (square.centerLatitude - coordinate.lat)/latitudeDifference,
@@ -103,9 +108,31 @@ app.controller('HomeController', function($scope) {
 					|| (!isAppearance && distanceToCenter < distanceForDisappearance)){
 					square.rectangle.setMap(null);
 					square.active = false;
+				} else {
+					if(square.north > maxLat){
+						maxLat = square.north;
+					}
+
+					if(square.south < minLat){
+						minLat = square.south;
+					}
+
+					if(square.east > maxLng){
+						maxLng = square.east;
+					}
+
+					if(square.west < minLng){
+						minLng = square.west;
+					}
 				}
 			}
 		});
+
+		var bounds = new google.maps.LatLngBounds(
+			new google.maps.LatLng(minLat, minLng), 
+			new google.maps.LatLng(maxLat, maxLng));
+
+		map.fitBounds(bounds);
 	};
 
 	buildStartingSquares = function(coordinate){
@@ -186,7 +213,6 @@ app.controller('HomeController', function($scope) {
 	centerOnCurrentLocation = function(position){
 		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude};
 		currentLocationMarker.setPosition(coordinate);		
-		map.setCenter(coordinate);
 	};
 
 	loadInitialMap = function(position){
@@ -244,7 +270,6 @@ app.controller('HomeController', function($scope) {
 		appearancePoints.push(coordinate);
 		appearanceOrDisappearance.push(true);
 		track(coordinate, true);
-		map.setCenter(coordinate);
 		currentLocationMarker.setPosition(coordinate);
 	};
 
