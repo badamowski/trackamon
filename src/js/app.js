@@ -127,12 +127,6 @@ app.controller('HomeController', function($scope) {
 				}
 			}
 		});
-
-		var bounds = new google.maps.LatLngBounds(
-			new google.maps.LatLng(minLat, minLng), 
-			new google.maps.LatLng(maxLat, maxLng));
-
-		map.fitBounds(bounds);
 	};
 
 	buildStartingSquares = function(coordinate){
@@ -221,7 +215,7 @@ app.controller('HomeController', function($scope) {
 		map = new google.maps.Map(document.getElementById('map'), {
 			center: coordinate,
 			mapTypeId: 'satellite',
-			zoom: 17,
+			zoom: 16,
 			streetViewControl: false,
 			zoomControlOptions: {
 				style: google.maps.ZoomControlStyle.SMALL,
@@ -253,6 +247,11 @@ app.controller('HomeController', function($scope) {
 
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(sightingButton[0]);
 		map.controls[google.maps.ControlPosition.TOP_CENTER].push(helpButton[0]);
+
+		if(!sessionStorage.getItem("TrackEmAll")){
+			$("#help-modal").modal();
+			sessionStorage.setItem("TrackEmAll", true);
+		}
 	};
 
 	addTrackingPointAtPosition = function(position){
