@@ -265,6 +265,7 @@ app.controller('HomeController', function($scope) {
 			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
 			//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
 			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
+			map.setCenter(coordinate);
 			tracking = true;
 		}
 
