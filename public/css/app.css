@@ -45,10 +45,6 @@ html, body {
 
 .loading {
   position: fixed;
-  z-index: 999;
-  height: 50%;
-  width: 50%;
-  overflow: show;
   margin: auto;
   top: 0;
   left: 0;
@@ -56,9 +52,8 @@ html, body {
   right: 0;
 }
 
-.loading:before {
+.loading-background {
   content: '';
-  display: block;
   position: fixed;
   top: 0;
   left: 0;

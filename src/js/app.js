@@ -286,11 +286,11 @@ app.controller('HomeController', function($scope) {
 	};
 
 	showLoading = function(){
-		$(".loading").show();
+		$(".loading-background").show();
 	};
 
 	hideLoading = function(){
-		$(".loading").hide();
+		$(".loading-background").hide();
 	};
 });
 
