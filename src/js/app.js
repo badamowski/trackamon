@@ -39,10 +39,12 @@ app.controller('HomeController', function($scope) {
 	};
 
 	$scope.addTrackingPoint = function(){
+		showLoading();
 		findCurrentLocation(addTrackingPointAtPosition);
 	};
 
 	$scope.addDisappearedPoint = function(){
+		showLoading();
 		findCurrentLocation(addDisappearedPointAtPosition);
 	};
 
@@ -270,6 +272,7 @@ app.controller('HomeController', function($scope) {
 		appearanceOrDisappearance.push(true);
 		track(coordinate, true);
 		currentLocationMarker.setPosition(coordinate);
+		hideLoading();
 	};
 
 	addDisappearedPointAtPosition = function(position) {
@@ -278,6 +281,15 @@ app.controller('HomeController', function($scope) {
 		appearanceOrDisappearance.push(false);
 		track(coordinate, false);
 		currentLocationMarker.setPosition(coordinate);
+		hideLoading();
+	};
+
+	showLoading = function(){
+		$(".loading").show();
+	};
+
+	hideLoading = function(){
+		$(".loading").hide();
 	};
 });
 
