@@ -15,12 +15,12 @@ app.controller('HomeController', function($scope) {
 		range = 200,
 		distanceForAppearance = (range + accuracy)/accuracy,
 		distanceForDisappearance = (range - accuracy)/accuracy,
-		clearButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
-		sightingButton = $('<button class="btn btn-raised btn-success btn-lg"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
-		disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
-		helpButton = $('<button class="btn btn-raised btn-lg"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>'),
-		refreshButton = $('<button class="btn btn-raised btn-info btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i> Re-Draw</button>'),
-		undoButton = $('<button class="btn btn-raised btn-danger btn-lg"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>'),
+		clearButton = $('<button class="btn btn-raised btn-danger btn-lg clear-button map-button" id="clearButton"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
+		sightingButton = $('<button class="btn btn-raised btn-success btn-lg sighting-button map-button" id="sightingButton"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
+		disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg disappeared-button map-button" id="disappearedButton"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
+		helpButton = $('<button class="btn btn-raised btn-lg help-button map-button" id="helpButton"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>'),
+		refreshButton = $('<button class="btn btn-raised btn-info btn-lg refresh-button map-button" id="refreshButton"><i class="fa fa-refresh" aria-hidden="true"></i> Re-Draw</button>'),
+		undoButton = $('<button class="btn btn-raised btn-danger btn-lg undo-button map-button" id="undoButton"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>'),
 		currentLocationMarker, 
 		map, 
 		latitudeDifference,	
@@ -61,7 +61,7 @@ app.controller('HomeController', function($scope) {
 
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].pop();
 		//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
-		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
+		//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
 	};
 
@@ -227,15 +227,13 @@ app.controller('HomeController', function($scope) {
 
 		currentLocationMarker = new google.maps.Marker({
 			position: coordinate,
-			icon: {
-				path: google.maps.SymbolPath.CIRCLE,
-				scale: 5,
-				fillColor: "#00BFFF",
-				fillOpacity: 1.0,
-				strokeColor: "#00BFFF",
-				strokeOpacity: 1.0,
-				zIndex: 20
-			},
+			icon: new google.maps.MarkerImage(
+				'//maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
+				new google.maps.Size(22,22),
+				new google.maps.Point(0,18),
+				new google.maps.Point(11,11)),
+			shadow: null,
+			clickable: false,
 			draggable: false,
 			map: map
 		});
@@ -264,7 +262,7 @@ app.controller('HomeController', function($scope) {
 			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
 			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
 			//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
-			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
+			//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
 			map.setCenter(coordinate);
 			tracking = true;
 		}
