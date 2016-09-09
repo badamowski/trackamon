@@ -18,9 +18,10 @@ app.controller('HomeController', function($scope) {
 		clearButton = $('<button class="btn btn-raised btn-danger btn-lg clear-button map-button" id="clearButton"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
 		sightingButton = $('<button class="btn btn-raised btn-success btn-lg sighting-button map-button" id="sightingButton"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
 		disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg disappeared-button map-button" id="disappearedButton"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
-		helpButton = $('<button class="btn btn-raised btn-lg help-button map-button" id="helpButton"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Help</button>'),
+		helpButton = $('<button class="btn btn-raised btn-lg help-button map-button" id="helpButton"><img src="img/trackemall-02.png" width="25"> Track \'Em All</button>'),
 		refreshButton = $('<button class="btn btn-raised btn-info btn-lg refresh-button map-button" id="refreshButton"><i class="fa fa-refresh" aria-hidden="true"></i> Re-Draw</button>'),
 		undoButton = $('<button class="btn btn-raised btn-danger btn-lg undo-button map-button" id="undoButton"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>'),
+		currentLocationButton = $('<button class="btn btn-raised btn-info btn-lg current-location-button map-button" id="currentLocationButton"><i class="fa fa-location-arrow" aria-hidden="true"></i></button>'),
 		currentLocationMarker, 
 		map, 
 		latitudeDifference,	
@@ -92,6 +93,10 @@ app.controller('HomeController', function($scope) {
 			undoSquare = disappearancePoints.pop();
 		}
 		console.log("TODO");
+	};
+
+	$scope.currentLocation = function(){
+		findCurrentLocation(centerOnCurrentLocation);
 	};
 
 	track = function(coordinate, isAppearance){
@@ -208,7 +213,8 @@ app.controller('HomeController', function($scope) {
 
 	centerOnCurrentLocation = function(position){
 		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude};
-		currentLocationMarker.setPosition(coordinate);		
+		currentLocationMarker.setPosition(coordinate);
+		map.setCenter(coordinate);		
 	};
 
 	loadInitialMap = function(position){
@@ -216,22 +222,24 @@ app.controller('HomeController', function($scope) {
 
 		map = new google.maps.Map(document.getElementById('map'), {
 			center: coordinate,
-			mapTypeId: 'satellite',
-			zoom: 16,
+			mapTypeId: 'roadmap',
+			zoom: 17,
 			streetViewControl: false,
-			zoomControlOptions: {
-				style: google.maps.ZoomControlStyle.SMALL,
-				position: google.maps.ControlPosition.LEFT_BOTTOM
-			}
+			mapTypeControl: false,
+			zoomControl:false,
+			styles: mapStyle
 		});
+
+		var icon = {
+			url: 'img/currentLocation.svg', // url
+			scaledSize: new google.maps.Size(22, 22), // scaled size
+			origin: new google.maps.Point(0,0), // origin
+			anchor: new google.maps.Point(11, 11) // anchor
+		};
 
 		currentLocationMarker = new google.maps.Marker({
 			position: coordinate,
-			icon: new google.maps.MarkerImage(
-				'//maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
-				new google.maps.Size(22,22),
-				new google.maps.Point(0,18),
-				new google.maps.Point(11,11)),
+			icon: icon,
 			shadow: null,
 			clickable: false,
 			draggable: false,
@@ -244,14 +252,11 @@ app.controller('HomeController', function($scope) {
 		helpButton.bind('click', $scope.openHelp);
 		refreshButton.bind('click', $scope.refresh);
 		undoButton.bind('click', $scope.undo);
+		currentLocationButton.bind('click', $scope.currentLocation);
 
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(sightingButton[0]);
 		map.controls[google.maps.ControlPosition.TOP_CENTER].push(helpButton[0]);
-
-		if(!sessionStorage.getItem("TrackEmAll")){
-			$("#help-modal").modal();
-			sessionStorage.setItem("TrackEmAll", true);
-		}
+		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(currentLocationButton[0]);
 	};
 
 	addTrackingPointAtPosition = function(position){
@@ -304,3 +309,48 @@ app.config(function($routeProvider) {
   
   .otherwise({redirectTo: '/'});
 });
+
+var mapStyle = [
+  {
+    "featureType": "road",
+    "elementType": "labels",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "poi",
+    "elementType": "labels",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "transit",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "water",
+    "elementType": "labels",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "landscape",
+    "elementType": "labels",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "administrative",
+    "elementType": "labels",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "administrative",
+    "elementType": "labels",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  }
+];

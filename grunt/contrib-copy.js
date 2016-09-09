@@ -5,7 +5,7 @@ module.exports = function(grunt) {
 			files: [{
 				expand: true,
 				cwd: "src/",
-				src: ["**/*.css", "**/*.html", "**/*.png"],
+				src: ["**/*.css", "**/*.html", "**/*.png", "**/*.svg", "**/*.gif"],
 				dest: "dist/"
 			}]
 		},
@@ -13,7 +13,7 @@ module.exports = function(grunt) {
 			files: [{
 				expand: true,
 				cwd: "src/lib",
-				src: ["**/*.js", "**/*.css", "**/*.html", "**/*.png"],
+				src: ["**/*.js", "**/*.css", "**/*.html", "**/*.png", "**/*.svg", "**/*.gif"],
 				dest: "dist/lib/"
 			}]
 		},
@@ -22,7 +22,7 @@ module.exports = function(grunt) {
 				// copy over static assets, css
 				expand: true,
 				cwd: "dist/",
-				src: ["**/*.js", "**/*.css", "**/*.html", "**/*.png"],
+				src: ["**/*.js", "**/*.css", "**/*.html", "**/*.png", "**/*.svg", "**/*.gif"],
 				dest: "public/"
 			}]
 		}
