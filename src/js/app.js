@@ -18,7 +18,7 @@ app.controller('HomeController', function($scope) {
 		clearButton = $('<button class="btn btn-raised btn-danger btn-lg clear-button map-button" id="clearButton"><i class="fa fa-times-circle" aria-hidden="true"></i> Clear</button>'),
 		sightingButton = $('<button class="btn btn-raised btn-success btn-lg sighting-button map-button" id="sightingButton"><i class="fa fa-crosshairs" aria-hidden="true"></i> Sighting</button>'),
 		disappearedButton = $('<button class="btn btn-raised btn-warning btn-lg disappeared-button map-button" id="disappearedButton"><i class="fa fa-ban" aria-hidden="true"></i> Disappeared</button>'),
-		helpButton = $('<button class="btn btn-raised btn-lg help-button map-button" id="helpButton"><img src="img/trackemall-02.png" width="25"> Track \'Em All</button>'),
+		helpButton = $('<button class="btn btn-raised btn-lg help-button map-button" id="helpButton"><img src="img/trackemall.png" width="25"> Track \'Em All</button>'),
 		refreshButton = $('<button class="btn btn-raised btn-info btn-lg refresh-button map-button" id="refreshButton"><i class="fa fa-refresh" aria-hidden="true"></i> Re-Draw</button>'),
 		undoButton = $('<button class="btn btn-raised btn-danger btn-lg undo-button map-button" id="undoButton"><i class="fa fa-undo" aria-hidden="true"></i> Undo</button>'),
 		currentLocationButton = $('<button class="btn btn-raised btn-info btn-lg current-location-button map-button" id="currentLocationButton"><i class="fa fa-location-arrow" aria-hidden="true"></i></button>'),
