@@ -80,6 +80,44 @@ html, body {
     animation:spin 1s linear infinite;
 }
 
+.btn {
+  background-color: rgba(238, 238, 238, 0.6) !important;
+}
+
+.text-primary {
+    color: #337ab7;
+}
+
+.border-success {
+  border-color: #4caf50;
+  border-width: thin;
+  border-style: solid;
+}
+
+.border-danger {
+  border-color: #f44336;
+  border-width: thin;
+  border-style: solid;
+}
+
+.border-warning {
+  border-color: #ff5722;
+  border-width: thin;
+  border-style: solid;
+}
+
+.border-primary {
+  border-color: #337ab7;
+  border-width: thin;
+  border-style: solid;
+}
+
+.border {
+  border-color: rgba(0,0,0,.87);
+  border-width: thin;
+  border-style: solid;
+}
+
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
 @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
