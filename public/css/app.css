@@ -74,6 +74,10 @@ html, body {
   width: 40%;
 }
 
+.sighting-button{
+  bottom: 26px;
+}
+
 .loading-logo {
     -webkit-animation:spin 1s linear infinite;
     -moz-animation:spin 1s linear infinite;
@@ -81,7 +85,7 @@ html, body {
 }
 
 .btn {
-  background-color: rgba(238, 238, 238, 0.6) !important;
+  background-color: rgba(238, 238, 238, 0.75) !important;
 }
 
 .text-primary {
