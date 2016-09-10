@@ -96,15 +96,10 @@ app.controller('HomeController', function($scope) {
 	};
 
 	$scope.currentLocation = function(){
-		findCurrentLocation(centerOnCurrentLocation);
+		$scope.refresh();
 	};
 
 	track = function(coordinate, isAppearance){
-		var maxLat = coordinate.lat, 
-			maxLng = coordinate.lng, 
-			minLat = coordinate.lat,
-			minLng = coordinate.lng;
-
 		_.each(squares, function(square){
 			if(square.active){
 				var latitudeLength = (square.centerLatitude - coordinate.lat)/latitudeDifference,
@@ -116,21 +111,7 @@ app.controller('HomeController', function($scope) {
 					square.rectangle.setMap(null);
 					square.active = false;
 				} else {
-					if(square.north > maxLat){
-						maxLat = square.north;
-					}
-
-					if(square.south < minLat){
-						minLat = square.south;
-					}
-
-					if(square.east > maxLng){
-						maxLng = square.east;
-					}
-
-					if(square.west < minLng){
-						minLng = square.west;
-					}
+					square.rectangle.setMap(map);
 				}
 			}
 		});
