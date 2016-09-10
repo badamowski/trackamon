@@ -71,6 +71,7 @@ app.controller('HomeController', function($scope) {
 	};
 
 	$scope.refresh = function(){
+		showLoading();
 		_.each(squares, function(square){
 			square.rectangle.setMap(null);
 		});
@@ -81,7 +82,7 @@ app.controller('HomeController', function($scope) {
 			}
 		});
 
-		findCurrentLocation(centerOnCurrentLocation);
+		findCurrentLocation(centerOnCurrentLocationThenHide);
 	};
 
 	$scope.undo = function(){
@@ -196,6 +197,11 @@ app.controller('HomeController', function($scope) {
 		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude};
 		currentLocationMarker.setPosition(coordinate);
 		map.setCenter(coordinate);		
+	};
+
+	centerOnCurrentLocationThenHide = function(position){
+		centerOnCurrentLocation(position);
+		hideLoading();		
 	};
 
 	loadInitialMap = function(position){
