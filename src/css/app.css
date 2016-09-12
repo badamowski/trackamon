@@ -96,6 +96,10 @@ html, body {
   width: 100%;
 }
 
+.track-em-all-color {
+  color: #F6504A;
+}
+
 .border-success {
   border-color: #4caf50;
   border-width: thin;
