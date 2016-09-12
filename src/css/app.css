@@ -92,6 +92,10 @@ html, body {
     color: #337ab7;
 }
 
+.help-image {
+  width: 100%;
+}
+
 .border-success {
   border-color: #4caf50;
   border-width: thin;
