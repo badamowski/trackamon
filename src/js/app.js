@@ -62,6 +62,8 @@ app.controller('HomeController', function($scope) {
 		disappearancePoints = [];
 		appearanceOrDisappearance = [];
 		localStorage.removeItem("trackEmAll");
+		localStorage.removeItem("trackEmAllLatitudeDifference");
+		localStorage.removeItem("trackEmAllLongitudeDifference");
 
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].pop();
 		//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
@@ -142,6 +144,9 @@ app.controller('HomeController', function($scope) {
 		if(longitudeDifference < 0){
 			longitudeDifference *= -1;
 		}
+
+		localStorage.setItem("trackEmAllLatitudeDifference", latitudeDifference);
+		localStorage.setItem("trackEmAllLongitudeDifference", longitudeDifference);
 
 		drawSquaresHorizontal(maxLongitudeWest, maxLongitudeEast, longitudeDifference, maxLatitudeSouth, maxLatitudeNorth, latitudeDifference);
 	};
@@ -265,6 +270,9 @@ app.controller('HomeController', function($scope) {
 				}
 				createRectangle(square.north, square.south, square.east, square.west, activeMap);
 			});
+
+			latitudeDifference = parseFloat(localStorage.getItem("trackEmAllLatitudeDifference"));
+			longitudeDifference = parseFloat(localStorage.getItem("trackEmAllLongitudeDifference"));
 		}
 	};
 
