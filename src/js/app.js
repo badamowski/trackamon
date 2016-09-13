@@ -10,6 +10,7 @@ app.controller('HomeController', function($scope) {
 		disappearancePoints = [],
 		appearanceOrDisappearance = [],
 		squares = [],
+		rectangles = [],
 		tracking = false,
 		accuracy = 10,
 		range = 200,
@@ -50,15 +51,17 @@ app.controller('HomeController', function($scope) {
 	};
 
 	$scope.clearTracking = function(){
-		_.each(squares, function(square){
-			square.rectangle.setMap(null);
+		_.each(rectangles, function(rectangle){
+			rectangle.setMap(null);
 		});
 
 		squares = [];
+		rectangles = [];
 		tracking = false;
 		appearancePoints = [];
 		disappearancePoints = [];
 		appearanceOrDisappearance = [];
+		localStorage.removeItem("trackEmAll");
 
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].pop();
 		//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
@@ -72,17 +75,7 @@ app.controller('HomeController', function($scope) {
 
 	$scope.refresh = function(){
 		showLoading();
-		_.each(squares, function(square){
-			square.rectangle.setMap(null);
-		});
-
-		_.each(squares, function(square){
-			if(square.active){
-				square.rectangle.setMap(map);
-			}
-		});
-
-		findCurrentLocation(centerOnCurrentLocationThenHide);
+		findCurrentLocation(refreshFunction);
 	};
 
 	$scope.undo = function(){
@@ -100,8 +93,22 @@ app.controller('HomeController', function($scope) {
 		$scope.refresh();
 	};
 
+	refreshFunction = function(coordinate){
+		_.each(rectangles, function(rectangle){
+			rectangle.setMap(null);
+		});
+
+		_.each(squares, function(square, index){
+			if(square.active){
+				rectangles[index].setMap(map);
+			}
+		});
+		centerOnCurrentLocation(coordinate);
+		hideLoading();
+	};
+
 	track = function(coordinate, isAppearance){
-		_.each(squares, function(square){
+		_.each(squares, function(square, index){
 			if(square.active){
 				var latitudeLength = (square.centerLatitude - coordinate.lat)/latitudeDifference,
 					longitudeLength = (square.centerLongitude - coordinate.lng)/longitudeDifference,
@@ -109,13 +116,15 @@ app.controller('HomeController', function($scope) {
 
 				if((isAppearance && distanceToCenter > distanceForAppearance)
 					|| (!isAppearance && distanceToCenter < distanceForDisappearance)){
-					square.rectangle.setMap(null);
+					rectangles[index].setMap(null);
 					square.active = false;
 				} else {
-					square.rectangle.setMap(map);
+					rectangles[index].setMap(map);
 				}
 			}
 		});
+
+		localStorage.setItem("trackEmAll", JSON.stringify(squares));
 	};
 
 	buildStartingSquares = function(coordinate){
@@ -160,18 +169,7 @@ app.controller('HomeController', function($scope) {
 
 	drawSquare = function(north, south, east, west){
 
-		var rectangle = new google.maps.Rectangle({
-			strokeWeight: 0,
-			fillColor: '#00FF00',
-			fillOpacity: 0.35,
-			map: map,
-			bounds: {
-				north: north,
-				south: south,
-				east: east,
-				west: west
-			}
-		});
+		createRectangle(north, south, east, west, map);
 
 		squares.push({
 			active: true,
@@ -180,9 +178,24 @@ app.controller('HomeController', function($scope) {
 			east: east,
 			west: west,
 			centerLatitude: (north+south)/2,
-			centerLongitude: (east+west)/2,
-			rectangle: rectangle
+			centerLongitude: (east+west)/2
 		});	
+	};
+
+	createRectangle = function(north, south, east, west, activeMap){
+
+		rectangles.push(new google.maps.Rectangle({
+			strokeWeight: 0,
+			fillColor: '#00FF00',
+			fillOpacity: 0.35,
+			map: activeMap,
+			bounds: {
+				north: north,
+				south: south,
+				east: east,
+				west: west
+			}
+		}));
 	};
 
 	findCurrentLocation = function(callback){
@@ -197,11 +210,6 @@ app.controller('HomeController', function($scope) {
 		var coordinate = {lat: position.coords.latitude, lng: position.coords.longitude};
 		currentLocationMarker.setPosition(coordinate);
 		map.setCenter(coordinate);		
-	};
-
-	centerOnCurrentLocationThenHide = function(position){
-		centerOnCurrentLocation(position);
-		hideLoading();		
 	};
 
 	loadInitialMap = function(position){
@@ -244,6 +252,20 @@ app.controller('HomeController', function($scope) {
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(sightingButton[0]);
 		map.controls[google.maps.ControlPosition.TOP_CENTER].push(helpButton[0]);
 		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(currentLocationButton[0]);
+
+		if(localStorage.getItem("trackEmAll") !== null){
+			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
+			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
+			tracking = true;
+			squares = JSON.parse(localStorage.getItem("trackEmAll"));
+			_.each(squares, function(square){
+				var activeMap = null;
+				if(square.active){
+					activeMap = map;
+				}
+				createRectangle(square.north, square.south, square.east, square.west, activeMap);
+			});
+		}
 	};
 
 	addTrackingPointAtPosition = function(position){
@@ -253,8 +275,6 @@ app.controller('HomeController', function($scope) {
 			buildStartingSquares(coordinate);
 			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
 			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
-			//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(undoButton[0]);
-			//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(refreshButton[0]);
 			map.setCenter(coordinate);
 			tracking = true;
 		}
