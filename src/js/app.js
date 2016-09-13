@@ -61,9 +61,7 @@ app.controller('HomeController', function($scope) {
 		appearancePoints = [];
 		disappearancePoints = [];
 		appearanceOrDisappearance = [];
-		localStorage.removeItem("trackEmAll");
-		localStorage.removeItem("trackEmAllLatitudeDifference");
-		localStorage.removeItem("trackEmAllLongitudeDifference");
+		removeLocalStorage();
 
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].pop();
 		//map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].pop();
@@ -93,6 +91,13 @@ app.controller('HomeController', function($scope) {
 
 	$scope.currentLocation = function(){
 		$scope.refresh();
+	};
+
+	removeLocalStorage = function(){
+		localStorage.removeItem("trackEmAll");
+		localStorage.removeItem("trackEmAllLatitudeDifference");
+		localStorage.removeItem("trackEmAllLongitudeDifference");
+		localStorage.removeItem("trackEmAllTime");
 	};
 
 	refreshFunction = function(coordinate){
@@ -127,6 +132,7 @@ app.controller('HomeController', function($scope) {
 		});
 
 		localStorage.setItem("trackEmAll", JSON.stringify(squares));
+		localStorage.setItem("trackEmAllTime", moment().format('MMMM Do YYYY, h:mm:ss a'));
 	};
 
 	buildStartingSquares = function(coordinate){
@@ -259,20 +265,24 @@ app.controller('HomeController', function($scope) {
 		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(currentLocationButton[0]);
 
 		if(localStorage.getItem("trackEmAll") !== null){
-			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
-			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
-			tracking = true;
-			squares = JSON.parse(localStorage.getItem("trackEmAll"));
-			_.each(squares, function(square){
-				var activeMap = null;
-				if(square.active){
-					activeMap = map;
-				}
-				createRectangle(square.north, square.south, square.east, square.west, activeMap);
-			});
+			if(moment().diff(moment(localStorage.getItem("trackEmAllTime"), 'MMMM Do YYYY, h:mm:ss a'), "minutes") >= 30){
+				removeLocalStorage();
+			}else{
+				map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clearButton[0]);
+				map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(disappearedButton[0]);
+				tracking = true;
+				squares = JSON.parse(localStorage.getItem("trackEmAll"));
+				_.each(squares, function(square){
+					var activeMap = null;
+					if(square.active){
+						activeMap = map;
+					}
+					createRectangle(square.north, square.south, square.east, square.west, activeMap);
+				});
 
-			latitudeDifference = parseFloat(localStorage.getItem("trackEmAllLatitudeDifference"));
-			longitudeDifference = parseFloat(localStorage.getItem("trackEmAllLongitudeDifference"));
+				latitudeDifference = parseFloat(localStorage.getItem("trackEmAllLatitudeDifference"));
+				longitudeDifference = parseFloat(localStorage.getItem("trackEmAllLongitudeDifference"));
+			}
 		}
 	};
 
