@@ -1,4 +1,4 @@
-var app = angular.module('trackamon', ['ngRoute']);
+var app = angular.module('trackamon', ['ngRoute', 'angular-google-adsense']);
 
 app.controller('ParentController', function($scope) {
 

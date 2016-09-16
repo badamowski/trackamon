@@ -9,7 +9,8 @@
     "grunt-contrib-copy": "~0.4.1",
     "grunt-contrib-uglify": "^0.6.0",
     "grunt-run": "~0.2.3",
-    "restify": "~2.8.2"
+    "restify": "~2.8.2",
+    "angular-google-adsense": "~0.4.5"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
