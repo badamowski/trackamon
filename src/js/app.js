@@ -331,6 +331,11 @@ app.config(function($routeProvider) {
     templateUrl : 'pages/home.html',
     controller  : 'HomeController'
   })
+
+  .when('/privacy', {
+    templateUrl : 'pages/privacy.html',
+    controller  : 'HomeController'
+  })
   
   .otherwise({redirectTo: '/'});
 });
